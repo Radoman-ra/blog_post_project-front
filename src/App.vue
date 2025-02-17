@@ -1,30 +1,34 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <header>
+      <h1>copy-of-wanago.io</h1>
+    </header>
+    <div class="container">
+      <aside class="sidebar">
+        <Sidebar />
+      </aside>
+      <main class="content">
+        <router-view />
+      </main>
+    </div>
+  </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script setup lang="ts">
+import Sidebar from "./components/Sidebar.vue";
+</script>
+
+<style>
+.container {
+  display: flex;
 }
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.sidebar {
+  width: 250px;
+  padding: 1rem;
+  border-right: 1px solid #ccc;
+}
+.content {
+  flex: 1;
+  padding: 1rem;
 }
 </style>
