@@ -9,7 +9,7 @@
       </p>
       <img
         v-if="post.image_url"
-        :src="post.image_url"
+        :src="getImageUrl(post.image_url)"
         alt="Post image"
         class="post-image"
       />
@@ -31,7 +31,7 @@ interface Post {
   id: number;
   title: string;
   published_at: string;
-  image_url: string | null;
+  image_url: string;
 }
 
 const posts = ref<Post[]>([]);
@@ -55,6 +55,14 @@ const fetchPosts = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const getImageUrl = (path: string): string => {
+  if (path.startsWith("static/")) {
+    const filename = path.split("/").pop();
+    return `http://localhost:8000/api/image/${filename}`;
+  }
+  return path;
 };
 
 const handleIntersection = (entries: IntersectionObserverEntry[]) => {

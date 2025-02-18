@@ -1,7 +1,9 @@
 <template>
   <div class="app-container">
     <header class="header">
-      <h1>copy-of-wanago.io Blog</h1>
+      <router-link to="/" class="header-link">
+        <h1>copy-of-wanago.io Blog</h1>
+      </router-link>
     </header>
     <div class="main-layout">
       <aside class="sidebar">
@@ -27,26 +29,36 @@ import Sidebar from "./components/Sidebar.vue";
   flex-direction: column;
   min-height: 100vh;
 }
+
 .header {
   background: #333;
   color: white;
   padding: 1rem;
   text-align: center;
 }
+
+.header-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .main-layout {
   display: flex;
   flex: 1;
 }
+
 .sidebar {
   width: 250px;
   padding: 1rem;
   background: #f4f4f4;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid #ccc;
 }
+
 .content {
   flex: 1;
   padding: 1rem;
 }
+
 .footer {
   background: #333;
   color: white;

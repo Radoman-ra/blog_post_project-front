@@ -4,9 +4,15 @@
       <h3>Серии</h3>
       <ul>
         <li v-for="serie in series" :key="serie.id">
-          <router-link :to="`/series/${serie.id}`">{{
-            serie.title
-          }}</router-link>
+          <router-link :to="`/series/${serie.id}`">
+            <img
+              v-if="serie.image_url"
+              :src="getImageUrl(serie.image_url)"
+              alt="Series image"
+              class="series-thumbnail"
+            />
+            {{ serie.title }}
+          </router-link>
         </li>
       </ul>
     </section>
@@ -28,6 +34,7 @@ import axios from "axios";
 interface Serie {
   id: number;
   title: string;
+  image_url: string;
 }
 interface Post {
   id: number;
@@ -36,6 +43,14 @@ interface Post {
 
 const series = ref<Serie[]>([]);
 const recentPosts = ref<Post[]>([]);
+
+const getImageUrl = (path: string): string => {
+  if (path.startsWith("static/")) {
+    const filename = path.split("/").pop();
+    return `http://localhost:8000/api/image/${filename}`;
+  }
+  return path;
+};
 
 const fetchSidebarData = async () => {
   try {
@@ -68,5 +83,14 @@ onMounted(fetchSidebarData);
 }
 .sidebar-content li {
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.series-thumbnail {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 </style>

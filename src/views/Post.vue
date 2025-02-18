@@ -1,5 +1,5 @@
 <template>
-  <div class="post-container">
+  <div class="post-container" v-if="post">
     <h2>{{ post.title }}</h2>
     <p class="post-meta">
       {{ new Date(post.published_at).toLocaleDateString() }}
@@ -9,16 +9,19 @@
     </p>
     <img
       v-if="post.image_url"
-      :src="post.image_url"
+      :src="getImageUrl(post.image_url)"
       alt="Post image"
       class="post-image"
     />
     <div v-html="renderedContent" class="post-content"></div>
   </div>
+  <div v-else class="loading">
+    <p>Загрузка поста...</p>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 import MarkdownIt from "markdown-it";
@@ -34,23 +37,44 @@ interface Post {
 
 const route = useRoute();
 const post = ref<Post | null>(null);
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-});
+const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
-onMounted(async () => {
+// Функция для формирования корректного URL изображения через API
+const getImageUrl = (path: string): string => {
+  if (path.startsWith("static/")) {
+    const filename = path.split("/").pop();
+    return `http://localhost:8000/api/image/${filename}`;
+  }
+  return path;
+};
+
+// Функция для получения данных поста по id
+const fetchPost = async (id: string | string[] | undefined) => {
+  if (!id) return;
   try {
-    const response = await axios.get(
-      `http://localhost:8000/posts/${route.params.id}`
-    );
+    const response = await axios.get(`http://localhost:8000/posts/${id}`);
     post.value = response.data;
   } catch (error) {
     console.error("Error fetching post detail:", error);
   }
+};
+
+// Получаем данные при первоначальном монтировании компонента
+onMounted(() => {
+  fetchPost(route.params.id);
 });
 
+// Смотрим за изменением параметра маршрута и обновляем данные поста
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId !== oldId) {
+      fetchPost(newId);
+    }
+  }
+);
+
+// Вычисляемое свойство для рендеринга Markdown контента
 const renderedContent = computed(() => {
   return post.value ? md.render(post.value.content) : "";
 });
@@ -73,5 +97,10 @@ const renderedContent = computed(() => {
 }
 .post-content {
   line-height: 1.6;
+}
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
 }
 </style>
