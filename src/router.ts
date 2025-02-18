@@ -1,22 +1,12 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "./components/Home.vue";
-import SeriesDetail from "./components/SeriesDetail.vue";
-import PostDetail from "./components/PostDetail.vue";
+import Home from "./views/Home.vue";
+import Series from "./views/Series.vue";
+import Post from "./views/Post.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/", name: "Home", component: Home },
-  {
-    path: "/series/:id",
-    name: "SeriesDetail",
-    component: SeriesDetail,
-    props: true,
-  },
-  {
-    path: "/posts/:id",
-    name: "PostDetail",
-    component: PostDetail,
-    props: true,
-  },
+  { path: "/series/:id", name: "Series", component: Series, props: true },
+  { path: "/posts/:id", name: "Post", component: Post, props: true },
 ];
 
 const router = createRouter({
