@@ -4,7 +4,7 @@
     <p class="post-meta">
       {{ new Date(post.published_at).toLocaleDateString() }}
       <span v-if="post.order_in_series">
-        | Порядковый номер в серии: {{ post.order_in_series }}</span
+        | Serial number in the series: {{ post.order_in_series }}</span
       >
     </p>
     <img
@@ -16,7 +16,7 @@
     <div v-html="renderedContent" class="post-content"></div>
   </div>
   <div v-else class="loading">
-    <p>Загрузка поста...</p>
+    <p>Loading a post...</p>
   </div>
 </template>
 
@@ -39,7 +39,6 @@ const route = useRoute();
 const post = ref<Post | null>(null);
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
-// Функция для формирования корректного URL изображения через API
 const getImageUrl = (path: string): string => {
   if (path.startsWith("static/")) {
     const filename = path.split("/").pop();
@@ -48,7 +47,6 @@ const getImageUrl = (path: string): string => {
   return path;
 };
 
-// Функция для получения данных поста по id
 const fetchPost = async (id: string | string[] | undefined) => {
   if (!id) return;
   try {
@@ -59,12 +57,10 @@ const fetchPost = async (id: string | string[] | undefined) => {
   }
 };
 
-// Получаем данные при первоначальном монтировании компонента
 onMounted(() => {
   fetchPost(route.params.id);
 });
 
-// Смотрим за изменением параметра маршрута и обновляем данные поста
 watch(
   () => route.params.id,
   (newId, oldId) => {
@@ -74,7 +70,6 @@ watch(
   }
 );
 
-// Вычисляемое свойство для рендеринга Markdown контента
 const renderedContent = computed(() => {
   return post.value ? md.render(post.value.content) : "";
 });

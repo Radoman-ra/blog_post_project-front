@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Последние посты</h2>
+    <h2>Last Posts</h2>
     <InfinitePosts />
   </div>
 </template>

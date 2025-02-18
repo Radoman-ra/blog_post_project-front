@@ -1,30 +1,30 @@
 <template>
   <div class="posts-container">
+    <div v-if="!loading && posts.length === 0" class="no-posts">
+      <p>There are no posts</p>
+    </div>
     <div v-for="post in posts" :key="post.id" class="post-card">
       <router-link :to="`/posts/${post.id}`">
+        <img
+          v-if="post.image_url"
+          :src="getImageUrl(post.image_url)"
+          alt="Post image"
+          class="post-image"
+        />
         <h3>{{ post.title }}</h3>
       </router-link>
       <p class="post-date">
         {{ new Date(post.published_at).toLocaleDateString() }}
       </p>
-      <img
-        v-if="post.image_url"
-        :src="getImageUrl(post.image_url)"
-        alt="Post image"
-        class="post-image"
-      />
     </div>
-    <div ref="loadMoreTrigger" class="load-more" v-if="!loading">
-      <p>Загрузка...</p>
-    </div>
-    <div v-if="loading" class="loading-indicator">
-      <p>Загрузка постов...</p>
+    <div ref="loadMoreTrigger" class="load-more">
+      <p v-if="loading">Loading...</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 
 interface Post {
@@ -41,12 +41,13 @@ const loading = ref(false);
 const loadMoreTrigger = ref<HTMLElement | null>(null);
 
 const fetchPosts = async () => {
+  if (loading.value) return;
   loading.value = true;
   try {
     const response = await axios.get(
       `http://localhost:8000/posts?offset=${offset.value}&limit=${limit}`
     );
-    if (response.data.length) {
+    if (Array.isArray(response.data) && response.data.length > 0) {
       posts.value.push(...response.data);
       offset.value += limit;
     }
@@ -66,18 +67,30 @@ const getImageUrl = (path: string): string => {
 };
 
 const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-  if (entries[0].isIntersecting && !loading.value) {
-    fetchPosts();
-  }
+  entries.forEach((entry) => {
+    if (entry.isIntersecting && !loading.value) {
+      fetchPosts();
+    }
+  });
 };
 
+let observer: IntersectionObserver | null = null;
 onMounted(() => {
   fetchPosts();
+
   if (loadMoreTrigger.value) {
-    const observer = new IntersectionObserver(handleIntersection, {
-      rootMargin: "200px",
+    observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: "100px",
+      threshold: 0.1,
     });
     observer.observe(loadMoreTrigger.value);
+  }
+});
+
+onUnmounted(() => {
+  if (observer && loadMoreTrigger.value) {
+    observer.unobserve(loadMoreTrigger.value);
   }
 });
 </script>
@@ -109,9 +122,14 @@ onMounted(() => {
   margin-top: 0.5rem;
   border-radius: 4px;
 }
-.load-more,
-.loading-indicator {
+.load-more {
   text-align: center;
   padding: 1rem;
+}
+.no-posts {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #555;
 }
 </style>

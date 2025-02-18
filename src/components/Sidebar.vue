@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar-content">
     <section class="series-list">
-      <h3>Серии</h3>
+      <h3>Series</h3>
       <ul>
         <li v-for="serie in series" :key="serie.id">
           <router-link :to="`/series/${serie.id}`">
@@ -17,7 +17,7 @@
       </ul>
     </section>
     <section class="recent-posts">
-      <h3>Последние посты</h3>
+      <h3>Last Posts</h3>
       <ul>
         <li v-for="post in recentPosts" :key="post.id">
           <router-link :to="`/posts/${post.id}`">{{ post.title }}</router-link>
