@@ -3,9 +3,12 @@
     <h2>{{ post.title }}</h2>
     <p class="post-meta">
       {{ new Date(post.published_at).toLocaleDateString() }}
-      <span v-if="post.order_in_series">
-        | Serial number in the series: {{ post.order_in_series }}</span
-      >
+      <template v-if="seriesDetail">
+        | Series: <strong>{{ seriesDetail.title }}</strong>
+        <span v-if="post.order_in_series && seriesDetail.posts">
+          — Post {{ post.order_in_series }} of {{ seriesDetail.posts.length }}
+        </span>
+      </template>
     </p>
     <img
       v-if="post.image_url"
@@ -33,10 +36,18 @@ interface Post {
   published_at: string;
   image_url: string | null;
   order_in_series?: number;
+  series_id?: number;
+}
+
+interface SeriesDetail {
+  id: number;
+  title: string;
+  posts: Post[];
 }
 
 const route = useRoute();
 const post = ref<Post | null>(null);
+const seriesDetail = ref<SeriesDetail | null>(null);
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
 const getImageUrl = (path: string): string => {
@@ -52,8 +63,25 @@ const fetchPost = async (id: string | string[] | undefined) => {
   try {
     const response = await axios.get(`http://localhost:8000/posts/${id}`);
     post.value = response.data;
+    if (post.value && post.value.series_id) {
+      fetchSeriesDetail(post.value.series_id);
+    } else {
+      seriesDetail.value = null;
+    }
   } catch (error) {
     console.error("Error fetching post detail:", error);
+  }
+};
+
+const fetchSeriesDetail = async (seriesId: number) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/series/${seriesId}`
+    );
+    seriesDetail.value = response.data;
+  } catch (error) {
+    console.error("Error fetching series detail:", error);
+    seriesDetail.value = null;
   }
 };
 
@@ -82,6 +110,7 @@ const renderedContent = computed(() => {
 .post-meta {
   font-size: 0.9rem;
   color: #666;
+  margin-bottom: 1rem;
 }
 .post-image {
   width: 100%;

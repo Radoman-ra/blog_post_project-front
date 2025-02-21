@@ -25,9 +25,15 @@ import Sidebar from "./components/Sidebar.vue";
 
 <style scoped>
 .app-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 90vh;
 }
 
 .header {
@@ -63,6 +69,7 @@ import Sidebar from "./components/Sidebar.vue";
   background: #333;
   color: white;
   text-align: center;
-  padding: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.9rem;
 }
 </style>
